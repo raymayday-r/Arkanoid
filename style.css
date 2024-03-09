@@ -1,0 +1,27 @@
+* {
+  padding: 0;
+  border: 0;
+  box-sizing: border-box;
+}
+
+body,
+figure {
+  color: white;
+  background-color: rgb(15, 15, 30);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+body figcaption,
+figure figcaption {
+  padding-top: 0.5rem;
+}
+
+#myCanvas {
+  margin-top: 15vh;
+  border-top: 4px solid lightcoral;
+  border-right: 4px solid lightcoral;
+  border-left: 4px solid lightcoral;
+  border-bottom: 4px solid darkgrey;
+}/*# sourceMappingURL=style.css.map */
