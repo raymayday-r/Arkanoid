@@ -14,10 +14,20 @@ const gameSpeed = 4;
 
 // 板子屬性
 let slide = {
+  length: 94, // 距離為左右圓心
   thickness: 6,
-  length: 94, // 長，距離為左右圓心
-  speed: null,
+  xLocation: null,
   yLocation: 356,
+  speed: (() => {
+    if (
+      navigator.userAgent.indexOf("Edg") != -1 ||
+      navigator.userAgent.indexOf("Chrome") != -1
+    ) {
+      return 3;
+    } else if (navigator.userAgent.indexOf("Firefox") != -1) {
+      return 12;
+    }
+  })(), // 依瀏覽器變化
   direction: "stop",
   leftKeySwitch: true, // 移動鍵接受的開關，用於改善操作體驗
   rightKeySwitch: true,
@@ -28,27 +38,28 @@ slide.xLocation = (canvas.width - slide.length) / 2; // 換算板子X位置、�
 let ball = {
   radius: 12,
   angle: 57.5, // 彈跳V字型的內角角度，57.5遊戲體驗較佳
-  speed: null,
-  xLocation: 320,
-  yLocation: 341,
-  direction: "",
+  hypotenuseSpeed: (() => {
+    if (
+      navigator.userAgent.indexOf("Edg") != -1 ||
+      navigator.userAgent.indexOf("Chrome") != -1
+    ) {
+      return 1.5;
+    } else if (navigator.userAgent.indexOf("Firefox") != -1) {
+      return 6;
+    }
+  })(),
+  xAxisSpeed: null, // 用 hypotenuseSpeed 換算出的x軸進程
+  yAxisSpeed: null, // 用 hypotenuseSpeed 換算出的y軸進程
+  xLocation: canvas.width / 2,
+  yLocation: null,
+  direction: null,
 };
-
-// 依瀏覽器調整速度
-if (
-  navigator.userAgent.indexOf("Edg") != -1 ||
-  navigator.userAgent.indexOf("Chrome") != -1
-) {
-  slide.speed = 3;
-  ball.speed = 1.5;
-} else if (navigator.userAgent.indexOf("Firefox") != -1) {
-  slide.speed = 12;
-  ball.speed = 6;
-}
-
+ball.yLocation = slide.yLocation - slide.thickness / 2 - ball.radius;
 // 換算球的斜線移動速度
-ball.xMove = Math.sin((ball.angle / 2) * (Math.PI / 180)) * ball.speed;
-ball.yMove = Math.cos((ball.angle / 2) * (Math.PI / 180)) * ball.speed;
+ball.xAxisSpeed =
+  Math.sin((ball.angle / 2) * (Math.PI / 180)) * ball.hypotenuseSpeed;
+ball.yAxisSpeed =
+  Math.cos((ball.angle / 2) * (Math.PI / 180)) * ball.hypotenuseSpeed;
 
 // 磚塊屬性
 let brick = {
@@ -58,7 +69,6 @@ let brick = {
   column: 10,
   row: 3,
   group: [], // 所有磚塊位置放置處
-  delete: false, // "刪除磚塊"的開關
   shotDown: 0, // 擊破計分
 };
 // 將磚塊寬、高、間距、列數、行數轉成座標，導入 group，供 ctx 繪製
@@ -252,20 +262,20 @@ function drawBasis() {
   // 球的移動速度、方向
   switch (ball.direction) {
     case "rightBottom":
-      ball.xLocation += ball.xMove;
-      ball.yLocation += ball.yMove;
+      ball.xLocation += ball.xAxisSpeed;
+      ball.yLocation += ball.yAxisSpeed;
       break;
     case "leftUpper":
-      ball.xLocation -= ball.xMove;
-      ball.yLocation -= ball.yMove;
+      ball.xLocation -= ball.xAxisSpeed;
+      ball.yLocation -= ball.yAxisSpeed;
       break;
     case "leftBottom":
-      ball.xLocation -= ball.xMove;
-      ball.yLocation += ball.yMove;
+      ball.xLocation -= ball.xAxisSpeed;
+      ball.yLocation += ball.yAxisSpeed;
       break;
     case "rightUpper":
-      ball.xLocation += ball.xMove;
-      ball.yLocation -= ball.yMove;
+      ball.xLocation += ball.xAxisSpeed;
+      ball.yLocation -= ball.yAxisSpeed;
       break;
   }
 
